@@ -10,7 +10,22 @@ export default class BootScene extends Phaser.Scene {
     this.load.image('hazelnut', 'assets/images/nuts/hazelnut.png');
     this.load.image('chestnut', 'assets/images/nuts/chestnut.png');
     this.load.image('walnut', 'assets/images/nuts/walnut.png');
-    this.load.image('tilemap', 'assets/images/tilemap_16x16.png');
+    this.load.image('tilemap', 'assets/images/tilemap/tilemap_16x16.png');
+
+    // Forest background
+    this.load.image('forest_tileset', 'assets/images/forest/Cluly_GB_Forest_Tileset.png');
+    this.load.image('env_rock', 'assets/images/forest/env_rock.png');
+    this.load.image('bgrd_tree', 'assets/images/forest/bgrd_tree1.png');
+
+    // Werewolf sprite
+    this.load.spritesheet('werewolf_walk', 'assets/images/werewolf/walk_black.png', {
+      frameWidth: 48,
+      frameHeight: 48
+    });
+    this.load.spritesheet('werewolf_dead', 'assets/images/werewolf/dead.png', {
+      frameWidth: 48,
+      frameHeight: 48
+    });
 
     // Loading bar
     const w = this.cameras.main.width;

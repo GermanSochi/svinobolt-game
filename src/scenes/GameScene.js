@@ -90,10 +90,7 @@ export default class GameScene extends Phaser.Scene {
     this._setupJoystick();
 
     // Connect to server
-    const protocol = window.location.protocol;
-    const host = window.location.hostname;
-    const port = window.location.port || (protocol === 'https:' ? 443 : 80);
-    this.socket = io(`${protocol}//${host}:${port}`);
+    this.socket = io(window.location.origin);
 
     this.socket.on('connect', () => {
       this.myId = this.socket.id;

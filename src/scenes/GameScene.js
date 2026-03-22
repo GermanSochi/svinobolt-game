@@ -89,12 +89,26 @@ export default class GameScene extends Phaser.Scene {
     // Joystick setup (bottom-right)
     this._setupJoystick();
 
+    // Waiting text while connecting
+    this.waitingText = this.add.text(
+      this.cameras.main.width / 2, this.cameras.main.height / 2,
+      'Подключение...', {
+        fontSize: '28px', fontFamily: 'Arial', color: '#ff4444',
+        stroke: '#000', strokeThickness: 3
+      }
+    ).setScrollFactor(0).setOrigin(0.5).setDepth(200);
+
     // Connect to server
-    this.socket = io(window.location.origin);
+    this.socket = io(window.location.origin, { transports: ['websocket', 'polling'] });
 
     this.socket.on('connect', () => {
       this.myId = this.socket.id;
+      if (this.waitingText) { this.waitingText.destroy(); this.waitingText = null; }
       this.socket.emit('join');
+    });
+
+    this.socket.on('connect_error', (err) => {
+      if (this.waitingText) this.waitingText.setText('Ошибка подключения: ' + err.message);
     });
 
     this.socket.on('state', (state) => this._onState(state));

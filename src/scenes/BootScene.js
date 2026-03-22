@@ -38,6 +38,10 @@ export default class BootScene extends Phaser.Scene {
       box.destroy();
       title.destroy();
     });
+
+    this.load.on('loaderror', (file) => {
+      console.warn('Failed to load:', file.src);
+    });
   }
 
   create() {

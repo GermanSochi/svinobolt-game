@@ -89,12 +89,26 @@ export default class GameScene extends Phaser.Scene {
     // Joystick setup (bottom-right)
     this._setupJoystick();
 
+    // Waiting text while connecting
+    this.waitingText = this.add.text(
+      this.cameras.main.width / 2, this.cameras.main.height / 2,
+      'Подключение...', {
+        fontSize: '28px', fontFamily: 'Arial', color: '#ff4444',
+        stroke: '#000', strokeThickness: 3
+      }
+    ).setScrollFactor(0).setOrigin(0.5).setDepth(200);
+
     // Connect to server
-    this.socket = io(window.location.origin);
+    this.socket = io(window.location.origin, { transports: ['websocket', 'polling'] });
 
     this.socket.on('connect', () => {
       this.myId = this.socket.id;
+      if (this.waitingText) { this.waitingText.destroy(); this.waitingText = null; }
       this.socket.emit('join');
+    });
+
+    this.socket.on('connect_error', (err) => {
+      if (this.waitingText) this.waitingText.setText('Ошибка подключения: ' + err.message);
     });
 
     this.socket.on('state', (state) => this._onState(state));
@@ -381,10 +395,26 @@ export default class GameScene extends Phaser.Scene {
     const headColor = isMe ? 0xcc3333 : 0x8844aa;
     const bodyColor = isMe ? 0xffaaaa : 0xddaaee;
 
-    const head = this.add.graphics();
-    head.x = data.x;
-    head.y = data.y;
-    this._drawHead(head, headColor);
+    let head;
+    if (this.textures.exists('werewolf_walk')) {
+      head = this.add.sprite(data.x, data.y, 'werewolf_walk');
+      head.setScale(0.8);
+      if (!this.anims.exists('walk_' + id)) {
+        this.anims.create({
+          key: 'walk_' + id,
+          frames: this.anims.generateFrameNumbers('werewolf_walk', { start: 0, end: 7 }),
+          frameRate: 8,
+          repeat: -1
+        });
+      }
+      head.play('walk_' + id);
+      if (isMe) head.setTint(0xff6666);
+    } else {
+      head = this.add.graphics();
+      head.x = data.x;
+      head.y = data.y;
+      this._drawHead(head, headColor);
+    }
     head.setDepth(10);
 
     // Eyes
@@ -533,7 +563,7 @@ export default class GameScene extends Phaser.Scene {
         let sprite;
         if (this.textures.exists(type)) {
           sprite = this.add.image(f.x, f.y, type);
-          sprite.setScale(0.4);
+          sprite.setScale(1.5);
         } else {
           // Fallback: draw a circle
           sprite = this.add.graphics();

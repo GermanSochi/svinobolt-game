@@ -12,6 +12,12 @@ const config = {
     mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
+  physics: {
+    default: 'arcade',
+    arcade: {
+      debug: false
+    }
+  },
   scene: [BootScene, GameScene],
   input: {
     activePointers: 2
